@@ -8,6 +8,7 @@ import Button from "../ui/button/Button";
 import { supabase } from "../../lib/supabase";
 
 export default function SignInForm() {
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [email, setEmail] = useState("");
@@ -15,7 +16,15 @@ export default function SignInForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+  const handleCheckboxChange = (checked: boolean) => {
+    setIsChecked(checked);
+    if (!checked) {
+      // Clear saved credentials when unchecked
+      localStorage.removeItem("savedEmail");
+      localStorage.removeItem("savedPassword");
+      localStorage.removeItem("rememberMe");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,6 +54,17 @@ export default function SignInForm() {
     // setUser(data);
     navigate("/home");
     setLoading(false);
+
+    // Save or clear credentials based on checkbox
+    if (isChecked) {
+      localStorage.setItem("savedEmail", email);
+      localStorage.setItem("savedPassword", password);
+      localStorage.setItem("rememberMe", "true");
+    } else {
+      localStorage.removeItem("savedEmail");
+      localStorage.removeItem("savedPassword");
+      localStorage.removeItem("rememberMe");
+    }
   };
 
   return (
@@ -67,10 +87,10 @@ export default function SignInForm() {
         <div>
           <div className="mb-5 sm:mb-8">
             <h1 className="mb-2 font-semibold text-gray-800 text-title-sm dark:text-white/90 sm:text-title-md">
-              Sign In
+              ເຂົ້າສູ່ລະບົບ
             </h1>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Enter your email and password to sign in!
+              ປອນຂ້ມູນ ອີເມວ ແລະ ປ້ອນລະຫັດຜ່ານຂອງທ່ານ!
             </p>
           </div>
           <div>
@@ -130,7 +150,7 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    Email <span className="text-error-500">*</span>{" "}
+                    ອີເມວ <span className="text-error-500">*</span>{" "}
                   </Label>
                   <Input
                     placeholder="info@gmail.com"
@@ -141,7 +161,7 @@ export default function SignInForm() {
                 </div>
                 <div>
                   <Label>
-                    Password <span className="text-error-500">*</span>{" "}
+                    ລະຫັດຜ່ານ <span className="text-error-500">*</span>{" "}
                   </Label>
                   <div className="relative">
                     <Input
@@ -165,13 +185,13 @@ export default function SignInForm() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Checkbox checked={isChecked} onChange={setIsChecked} />
+                    <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                       Keep me logged in
                     </span>
                   </div>
                   <Link
-                    to="/reset-password"
+                    to="/signin"
                     className="text-sm text-brand-500 hover:text-brand-600 dark:text-brand-400"
                   >
                     Forgot password?
