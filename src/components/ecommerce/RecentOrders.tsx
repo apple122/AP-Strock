@@ -131,38 +131,38 @@ export default function RecentOrders() {
           </button>
         </div>
       </div>
-      <div className="max-w-full overflow-x-auto">
+      <div className="max-w-full overflow-auto">
         <Table>
           {/* Table Header */}
-          <TableHeader className="border-gray-100 dark:border-gray-800 border-y">
+          <TableHeader className="border-gray-100 dark:border-gray-800 border-y overflow-auto">
             <TableRow>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="py-3 font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
               >
                 ສິນຄ້າ
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
               >
                 ປະເພດ
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
               >
                 ຈຳນວນ
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
               >
                 ລາຄາຈີງ
               </TableCell>
               <TableCell
                 isHeader
-                className="py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="font-medium text-gray-500 text-center text-theme-xs dark:text-gray-400"
               >
                 ລາຄາຂາຍລວມ
               </TableCell>
@@ -224,21 +224,21 @@ export default function RecentOrders() {
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="px-4 text-center text-gray-500 text-theme-sm dark:text-gray-400">
                     {item.pro_id?.cate_id?.name || '—'}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="px-4 text-center text-gray-500 text-theme-sm dark:text-gray-400">
                     {item.qty || 0}
                   </TableCell>
-                  <TableCell className="py-3 text-gray-500 text-theme-sm dark:text-gray-400">
-                    {(item.price || 0).toLocaleString('en-US')} ₭
+                  <TableCell className="px-4 text-center text-gray-500 text-theme-sm dark:text-gray-400">
+                    {(item.price || 0).toLocaleString('en-US')+'₭'}
                   </TableCell>
-                  <TableCell className="py-3">
+                  <TableCell className="px-4 text-center">
                     <Badge
                       size="sm"
                       color={isPromo ? "warning" : "success"}
                     >
-                     {isPromo ? "ໂປຣ:" : ""} {total.toLocaleString('en-US')} ₭
+                     {isPromo ? "ໂປຣ:" : ""} {total.toLocaleString('en-US')}₭
                     </Badge>
                   </TableCell>
                 </TableRow>
