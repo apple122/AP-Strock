@@ -244,6 +244,12 @@ export default function Index_Order() {
                                         isHeader
                                         className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
                                     >
+                                        ຜູ້ຮັບ
+                                    </TableCell>
+                                    <TableCell
+                                        isHeader
+                                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                    >
                                         ລາຍການ
                                     </TableCell>
                                     <TableCell
