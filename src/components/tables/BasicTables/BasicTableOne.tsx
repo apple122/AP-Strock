@@ -119,7 +119,7 @@ export default function BasicTableOne() {
             <TableRow>
               <TableCell
                 isHeader
-                className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                className="sticky left-0 z-20 px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-700"
               >
                 User
               </TableCell>
@@ -154,7 +154,7 @@ export default function BasicTableOne() {
           <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
             {tableData.map((order) => (
               <TableRow key={order.id}>
-                <TableCell className="px-5 py-4 sm:px-6 text-start">
+                <TableCell className="sticky left-0 z-10 px-5 py-4 sm:px-6 text-start bg-white hover:bg-gray-50 dark:bg-white/[0.03] dark:hover:bg-gray-900/50 border-r border-gray-200 dark:border-gray-700">
                   <div className="flex items-center gap-3">
                     <div className="w-10 h-10 overflow-hidden rounded-full">
                       <img

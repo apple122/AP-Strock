@@ -76,7 +76,7 @@ export default function Index_Expenses() {
 
   return (
     <>
-      <div className="flex justify-end mb-2 gap-1">
+      <div className="flex md:justify-end mb-2 gap-1">
         <Button size="sm" className='h-6' variant="outline" onClick={() => handleCreate()}>
           ເພີມລາຍການໃຊ້ຈ່າຍ
         </Button>

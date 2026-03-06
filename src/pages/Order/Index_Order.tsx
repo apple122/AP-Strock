@@ -107,6 +107,10 @@ export default function Index_Order() {
                 })
                 .join(' | ')
 
+            const addressStr = o.address
+                ? `${o.address.name || ''} | ${o.address.phone || ''} | ${o.address.branch || ''} | ${o.address.address || ''}`
+                : ''
+
             return [
                 o.phase_id?.phase_name,
                 o.created_at ? new Date(o.created_at).toLocaleString() : '',
@@ -116,7 +120,7 @@ export default function Index_Order() {
                 o.payee ?? '',
                 items,
                 o.user_id?.fullname || '',
-                o.address || '',
+                addressStr,
             ]
         })
 
@@ -226,7 +230,7 @@ export default function Index_Order() {
                                 <TableRow>
                                     <TableCell
                                         isHeader
-                                        className="px-5 w-1 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                        className="sticky left-0 z-20 px-5 w-1 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 dark:border-blue-800"
                                     >
                                         Order#
                                     </TableCell>
@@ -281,8 +285,9 @@ export default function Index_Order() {
                                         key={o.id}
                                         className='hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer'
                                     >
-                                        <TableCell onClick={() => { setSelectedOrder(o); openModal() }} className="px-5  w-1 text-gray-500 text-theme-sm dark:text-gray-400">#{o.order || '#'}</TableCell>
+                                        <TableCell onClick={() => { setSelectedOrder(o); openModal() }} className="sticky left-0 z-10 px-5 w-1 text-gray-500 text-theme-sm dark:text-gray-400 bg-gray-50 hover:bg-gray-100 dark:bg-gray-900/50 dark:hover:bg-gray-900 dark:border-gray-700">#{o.order || '#'}</TableCell>
                                         <TableCell onClick={() => { setSelectedOrder(o); openModal() }} className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">{o.created_at ? new Date(o.created_at).toLocaleString() : ''}</TableCell>
+                                        <TableCell onClick={() => { setSelectedOrder(o); openModal() }} className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">{o.address.name || ''}</TableCell>
                                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                                             <ul className='h-10 w-75 overflow-auto'>
                                                 {o.OrderItem?.map((it: any) => (

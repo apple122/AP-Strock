@@ -33,7 +33,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="sticky left-0 z-20 px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 border-r border-gray-200 dark:border-gray-700"
                 >
                   #
                 </TableCell>
@@ -85,7 +85,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
               <TableRow>
                 <TableCell
                   isHeader
-                  className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                  className="sticky left-0 z-20 px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 dark:border-gray-700"
                 >
                   #
                 </TableCell>
@@ -112,7 +112,7 @@ const CategoryTable: React.FC<CategoryTableProps> = ({
             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
               {categories.map((it, idx) => (
                 <TableRow key={it.id} className='hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer'>
-                  <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">
+                  <TableCell className="sticky left-0 z-10 px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400 hover:bg-gray-200 bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-gray-800 dark:border-gray-700">
                     {idx + 1}
                   </TableCell>
                   <TableCell className="px-4 py-3 text-gray-500 text-theme-sm dark:text-gray-400">

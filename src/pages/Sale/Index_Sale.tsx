@@ -202,7 +202,7 @@ export default function Index_Sale() {
                                 <TableRow>
                                     <TableCell
                                         isHeader
-                                        className="px-5 w-1 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                        className="sticky left-0 z-20 px-5 w-1 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 dark:border-gray-700"
                                     >
                                         Order#
                                     </TableCell>
@@ -265,7 +265,7 @@ export default function Index_Sale() {
                                             key={sale.id}
                                             className='hover:bg-gray-100 dark:hover:bg-gray-800'
                                         >
-                                            <TableCell className="px-5 w-1 text-gray-500 text-theme-sm dark:text-gray-400">
+                                            <TableCell className="sticky left-0 z-10 px-5 w-1 text-gray-500 text-theme-sm dark:text-gray-400 hover:bg-gray-100 bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-gray-900/50 dark:border-gray-700">
                                                 #{sale.order_id?.order}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">

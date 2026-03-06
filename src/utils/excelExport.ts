@@ -76,6 +76,9 @@ export const exportExcel = async (activePhase: Phase) => {
       const items = (o.OrderItem || [])
         .map((it: any) => `${it.pro_id?.pro_name || ''} x ${it.qty} @ ${it.price?.toLocaleString('en-US')} ₭`)
         .join(' | ');
+      const addressStr = o.address
+        ? `${o.address.name || ''} | ${o.address.phone || ''} | ${o.address.branch || ''} | ${o.address.address || ''}`
+        : '';
       return [
         o.created_at ? new Date(o.created_at).toLocaleString() : '',
         o.pm_type || '',
@@ -84,7 +87,7 @@ export const exportExcel = async (activePhase: Phase) => {
         o.payee ?? '',
         items,
         o.user_id?.fullname || '',
-        o.address || '',
+        addressStr,
       ];
     });
 

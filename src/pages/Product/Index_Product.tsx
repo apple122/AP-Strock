@@ -261,7 +261,7 @@ export default function Index_Product() {
                                 <TableRow>
                                     <TableCell
                                         isHeader
-                                        className="px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400"
+                                        className="sticky left-0 z-20 px-5 py-3 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 dark:border-blue-800"
                                     >
                                         #
                                     </TableCell>
@@ -339,7 +339,7 @@ export default function Index_Product() {
                             
                                 {products.map((product: any, idx: number) => (
                                     <TableRow onClick={() => plusArchived(product)} key={product.id} className={`hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer ${(product.qty_stock || 0) === 0 ? 'bg-gray-400 dark:bg-gray-700' : ''}`}>
-                                        <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
+                                        <TableCell className="sticky left-0 z-10 px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400 hover:bg-blue-100 bg-gray-50 dark:bg-gray-900/50 dark:hover:bg-blue-900 dark:border-blue-800">
                                             {(page - 1) * perPage + idx + 1}
                                         </TableCell>
                                         <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
