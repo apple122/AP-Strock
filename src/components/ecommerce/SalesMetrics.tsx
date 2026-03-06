@@ -7,7 +7,11 @@ interface SalesMetric {
     total: number
 }
 
-export default function SalesMetrics() {
+interface SalesMetricsProps {
+    refreshTrigger?: number
+}
+
+export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {}) {
     const [todaySales, setTodaySales] = useState(0)
     const [todayCount, setTodayCount] = useState(0)
     const [monthSales, setMonthSales] = useState(0)
@@ -136,7 +140,7 @@ export default function SalesMetrics() {
         }
 
         fetchSalesMetrics()
-    }, [])
+    }, [refreshTrigger])
 
     if (error) {
         return (

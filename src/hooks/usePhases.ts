@@ -64,12 +64,11 @@ export function usePhases() {
                 .select()
                 .single()
 
-                window.location.reload()
             if (insertError) throw insertError
 
             // Refresh phases
             await fetchPhases()
-            alert(`ເຟສໃໝ່ "${newPhaseName}" ໄດ້ຖືກສ້າງແລ້ວ!`)
+            alert(`ເຟສໃໝ່ "${newPhaseName}" ໄດ້ຖືກສ້າងແລ້ວ!`)
 
             return data
         } catch (err) {
@@ -93,8 +92,6 @@ export function usePhases() {
                 .from('Phase')
                 .update({ status: 'active' })
                 .eq('id', id)
-                
-                window.location.reload()
 
             if (updErr) throw updErr
 

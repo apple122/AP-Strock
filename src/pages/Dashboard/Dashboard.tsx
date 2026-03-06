@@ -9,6 +9,8 @@ export default function Dashboard() {
   const { phases, createNewPhase, setActivePhase, loading } = usePhases();
 
   const [selectedPhase, setSelectedPhase] = useState<string>('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [isChangingPhase, setIsChangingPhase] = useState(false);
 
   // keep selection in sync with active phase list
   useEffect(() => {
@@ -24,13 +26,18 @@ export default function Dashboard() {
     const val = e.target.value;
     setSelectedPhase(val);
     try {
+      setIsChangingPhase(true);
       if (val === 'new') {
         await createNewPhase();
+        setRefreshTrigger(prev => prev + 1);
       } else {
         await setActivePhase(parseInt(val));
+        setRefreshTrigger(prev => prev + 1);
       }
     } catch (err) {
       console.error('Phase change failed:', err);
+    } finally {
+      setIsChangingPhase(false);
     }
   };
 
@@ -54,6 +61,17 @@ export default function Dashboard() {
 
   return (
     <>
+      {isChangingPhase && (
+        <div className="fixed inset-0  flex items-center justify-center z-9999 backdrop-blur-sm">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 flex flex-col items-center gap-4">
+            <svg className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            <p className="text-sm text-gray-600 dark:text-gray-300">ກຳລັງປ່ຽນເຟສ...</p>
+          </div>
+        </div>
+      )}
       <div className="grid grid-cols-12 gap-4 md:gap-6">
         <div className="col-span-12 space-y-6 xl:col-span-12">
           <div className="flex items-center gap-2">
@@ -61,8 +79,8 @@ export default function Dashboard() {
             <select
               value={selectedPhase}
               onChange={handlePhaseChange}
-              disabled={loading}
-              className="h-8 text-sm rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300"
+              disabled={loading || isChangingPhase}
+              className="h-8 text-sm rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="new">+ ສ້າງຂໍ້ມູນໃໝ່</option>
               {phases.map(p => (
@@ -78,7 +96,7 @@ export default function Dashboard() {
         </div>
 
         <div className="col-span-12 space-y-6 xl:col-span-12">
-          <SalesMetrics />
+          <SalesMetrics refreshTrigger={refreshTrigger} />
         </div>
 
         <div className="col-span-12 xl:col-span-12">
