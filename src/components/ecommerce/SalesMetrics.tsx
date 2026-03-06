@@ -156,7 +156,7 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                 <div className="rounded-xl border col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດຂາຍວັນນີ້</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">
                         {loading ? '...' : todaySales.toLocaleString('en-US')} ₭
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{todayCount} ລາຍການ</p>
@@ -164,21 +164,21 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
 
                 <div className="rounded-xl border col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດຂາຍເດືອນນີ້</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">
                         {loading ? '...' : monthSales.toLocaleString('en-US')} ₭
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{monthCount} ລາຍການ</p>
                 </div>
                 <div className="rounded-xl border col-span-1 lg:col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດຂາຍທັງໝົດ</p>
-                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                    <p className="text-[18px] font-bold text-gray-900 dark:text-white">
                         {loading ? '...' : totalSales.toLocaleString('en-US')} ₭
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{loading ? '...' : totalCount} ລາຍການ</p>
                 </div>
                 <div className="rounded-xl border col-span-1 lg:col-span-1 border-red-400 bg-white p-4 dark:border-red-400 dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ລາຍຈ່າຍທັງໝົດ</p>
-                    <p className="text-2xl font-bold text-red-400 dark:text-red-400">
+                    <p className="text-[18px] font-bold text-red-400 dark:text-red-400">
                         - {loading ? '...' : totalExpenses.toLocaleString('en-US')} ₭
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{loading ? '...' : expenseCount} ລາຍການ</p>
