@@ -24,7 +24,8 @@ export default function Index_Sale() {
                 setLoadingTotal(true)
                 const { data: allOrders } = await supabase
                     .from('Order')
-                    .select('sale_price')
+                    .select('sale_price, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
                 let total = 0
                 if (allOrders) {
                     allOrders.forEach((o: any) => {
@@ -78,8 +79,9 @@ export default function Index_Sale() {
             return
         }
 
-        const headers = ['IMG', 'ສິນຄ້າ', 'ຈຳນວນຂາຍ', 'ລາຄາ', 'ລາຄາໂປຣ', 'ເງີນລວມ', 'ເວລາຂາຍ']
+        const headers = ['#ເຟສ','IMG', 'ສິນຄ້າ', 'ຈຳນວນຂາຍ', 'ລາຄາ', 'ລາຄາໂປຣ', 'ເງີນລວມ', 'ເວລາຂາຍ']
         const rows = sales.map((sale: any) => [
+            sale.order_id?.phase_id?.phase_name || '',
             sale.pro_id?.pro_img || '',
             sale.pro_id?.pro_name || '',
             sale.qty || '',
@@ -97,7 +99,7 @@ export default function Index_Sale() {
             const ws = XLSX.utils.aoa_to_sheet(aoa)
             XLSX.utils.book_append_sheet(wb, ws, 'Sales')
             const ts = new Date().toISOString().replace(/[:.]/g, '-')
-            XLSX.writeFile(wb, `sales-${ts}.xlsx`)
+            XLSX.writeFile(wb, `ລາຍການຂາຍ-${ts}.xlsx`)
             return
         } catch (xlsxErr) {
             console.warn('SheetJS not available, falling back to CSV export', xlsxErr)
@@ -253,8 +255,8 @@ export default function Index_Sale() {
                             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
                                 {filteredSales.length === 0 ? (
                                     <TableRow>
-                                        <TableCell className="px-4 py-6 text-center text-gray-500 dark:text-gray-400">
-                                            No sales data available
+                                        <TableCell className="px-4 py-6 w-full text-center text-gray-500 dark:text-gray-400">
+                                            ບໍ່ມີລາຍການຂາຍ
                                         </TableCell>
                                     </TableRow>
                                 ) : (

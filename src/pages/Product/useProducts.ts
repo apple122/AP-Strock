@@ -11,6 +11,10 @@ export interface Product {
   qty_stock?: number           // remaining stock
   cost_price: number
   sell_price: number
+  phase_id?: {
+    phase_name: string
+    status: string
+  }
   user?: {
     fullname: string
   }
@@ -47,9 +51,11 @@ export function useProducts() {
         .select(
           `*,
           user(*),
-          cate_id(*)`,
+          cate_id(*),
+          phase_id!inner(phase_name, status)`,
           { count: 'exact' }
         )
+        .eq('phase_id.status', 'active')
         .order('id', { ascending: false })
         .order('is_archived', { ascending: true })
         .range(from, to)

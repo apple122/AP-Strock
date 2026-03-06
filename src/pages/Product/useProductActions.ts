@@ -1,7 +1,6 @@
 import { useCallback } from "react";
 import { useNavigate } from "react-router";
 import { supabase } from "../../lib/supabase";
-import * as XLSX from "xlsx";
 import { Product } from "./useProducts";
 
 export function useProductActions(
@@ -51,11 +50,15 @@ export function useProductActions(
         await fetchProducts({ cate_id: val ? parseInt(val) : undefined }, 1);
     }, [fetchProducts]);
 
-    const exportCsv = useCallback(() => {
-        if (!products || products.length === 0) return;
+    const exportCsv = useCallback(async () => {
+        if (!products || products.length === 0) {
+            alert('No products to export')
+            return
+        }
 
-        // build a 2D array with header row followed by product data
+        // Prepare data
         const headers = [
+            "#ເຟສ",
             "Image URL",
             "ໍສິນຄ້າ",
             "SKU",
@@ -69,6 +72,7 @@ export function useProductActions(
             "ວັນທີ່ສ້າງ",
         ];
         const rows = products.map(p => [
+            p.phase_id?.phase_name || "",
             p.pro_img || "",
             p.pro_name,
             p.sku,
@@ -82,13 +86,46 @@ export function useProductActions(
             p.created_at || "",
         ]);
 
-        const data = [headers, ...rows];
-        const worksheet = XLSX.utils.aoa_to_sheet(data);
-        const workbook = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(workbook, worksheet, "ນຳເຂົ້າສິນຄ້າ");
+        // Try SheetJS (.xlsx) via dynamic import
+        try {
+            const XLSX = await import('xlsx')
+            const wb = XLSX.utils.book_new()
+            const aoa = [headers, ...rows]
+            const ws = XLSX.utils.aoa_to_sheet(aoa)
+            XLSX.utils.book_append_sheet(wb, ws, "ນຳເຂົ້າສິນຄ້າ")
+            const ts = new Date().toISOString().replace(/[:.]/g, '-')
+            XLSX.writeFile(wb, `ນຳເຂົ້າສິນຄ້າ-${ts}.xlsx`)
+            return
+        } catch (xlsxErr) {
+            console.warn('SheetJS not available, falling back to CSV export', xlsxErr)
+        }
 
-        // write and trigger download
-        XLSX.writeFile(workbook, "ນຳເຂົ້າສິນຄ້າ.xlsx");
+        // Fallback: CSV download (UTF-8 BOM)
+        try {
+            const bom = '\uFEFF'
+            const titleLine = 'ນຳເຂົ້າສິນຄ້າ'
+            const csvLines = [
+                titleLine,
+                '',
+                headers.join(','),
+                ...rows.map((r: any[]) => r.map((c: any) => `"${String(c).replace(/"/g, '""')}"`).join(',')),
+            ]
+
+            const csv = bom + csvLines.join('\r\n')
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            const ts = new Date().toISOString().replace(/[:.]/g, '-')
+            a.href = url
+            a.download = `products-${ts}.csv`
+            document.body.appendChild(a)
+            a.click()
+            a.remove()
+            URL.revokeObjectURL(url)
+        } catch (err) {
+            console.error('Export failed', err)
+            alert('Export failed')
+        }
     }, [products]);
 
     return {

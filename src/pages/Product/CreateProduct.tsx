@@ -123,6 +123,19 @@ export default function CreateProduct() {
         setLoading(true);
 
         try {
+            // Get active phase
+            const { data: activePhase } = await supabase
+                .from('Phase')
+                .select('id')
+                .eq('status', 'active')
+                .single()
+
+            if (!activePhase) {
+                alert('No active phase found. Please create a phase first.')
+                setLoading(false)
+                return
+            }
+
             let imageUrl = formData.pro_img;
 
             // if user dropped a file, upload to storage
@@ -155,6 +168,7 @@ export default function CreateProduct() {
                         sell_price: parseFloat(formData.sell_price),
                         cate_id: parseInt(formData.cate_id),
                         user: parseInt(formData.user_id),
+                        phase_id: activePhase.id,
                     }
                 ]);
 

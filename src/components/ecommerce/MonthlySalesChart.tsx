@@ -22,7 +22,8 @@ export default function MonthlySalesChart() {
         setLoading(true);
         const { data: items, error } = await supabase
           .from("OrderItem")
-          .select(`*, order_id(created_at, promotion)`);
+          .select(`*, order_id!inner(created_at, promotion, phase_id!inner(status))`)
+          .eq('order_id.phase_id.status', 'active');
 
         if (error) throw error;
 

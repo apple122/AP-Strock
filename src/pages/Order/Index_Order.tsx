@@ -28,6 +28,17 @@ export default function Index_Order() {
     const [loadingTotal, setLoadingTotal] = useState(true)
     const [totalAllPayeeTotals, setTotalAllPayeeTotals] = useState<Record<string, number>>({})
 
+    // Close modal on ESC key press
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && isOpen) {
+                closeModal()
+            }
+        }
+        window.addEventListener('keydown', handleEsc)
+        return () => window.removeEventListener('keydown', handleEsc)
+    }, [isOpen, closeModal])
+
     // Fetch grand total revenue on mount
     useEffect(() => {
         const fetchGrandTotal = async () => {
@@ -35,7 +46,8 @@ export default function Index_Order() {
                 setLoadingTotal(true)
                 const { data: allOrders } = await supabase
                     .from('Order')
-                    .select('sale_price, payee')
+                    .select('sale_price, payee, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
                 let total = 0
                 const payeeMap: Record<string, number> = {}
                 if (allOrders) {
@@ -86,7 +98,7 @@ export default function Index_Order() {
         }
 
         // Prepare rows
-        const headers = ['ເວລາ', 'ການຈ່າຍ', 'ຈຳນວນລວມ', 'ເງີນລວມ', 'ຜູ້ຮັບເງີນ', 'ລາຍການ', 'ຜູ້ອອກບີນ', 'ຈັດສົ່ງ']
+        const headers = ['#ເຟສ', 'ເວລາ', 'ການຈ່າຍ', 'ຈຳນວນລວມ', 'ເງີນລວມ', 'ຜູ້ຮັບເງີນ', 'ລາຍການ', 'ຜູ້ອອກບີນ', 'ຈັດສົ່ງ']
         const rows = orders.map((o: any) => {
             const items = (o.OrderItem || [])
                 .map((it: any) => {
@@ -96,6 +108,7 @@ export default function Index_Order() {
                 .join(' | ')
 
             return [
+                o.phase_id?.phase_name,
                 o.created_at ? new Date(o.created_at).toLocaleString() : '',
                 o.pm_type || '',
                 o.total_qty ?? '',
@@ -115,7 +128,7 @@ export default function Index_Order() {
             const ws = XLSX.utils.aoa_to_sheet(aoa)
             XLSX.utils.book_append_sheet(wb, ws, 'Orders')
             const ts = new Date().toISOString().replace(/[:.]/g, '-')
-            XLSX.writeFile(wb, `orders-${ts}.xlsx`)
+            XLSX.writeFile(wb, `ອໍເດີ້ຂາຍ-${ts}.xlsx`)
             return
         } catch (xlsxErr) {
             console.warn('SheetJS not available, falling back to CSV export', xlsxErr)
@@ -318,6 +331,13 @@ export default function Index_Order() {
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {orders.length === 0 && (
+                                    <TableRow>
+                                        <TableCell className="px-4 py-6 w-full text-center text-gray-500 dark:text-gray-400">
+                                            ບໍ່ມີລາຍການ
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     )}
@@ -366,8 +386,8 @@ export default function Index_Order() {
             {isOpen && selectedOrder && (
                 <div className='relative z-99999'>
                     <div className="fixed inset-0 bg-black opacity-50 flex items-center justify-center z-998 p-4"></div>
-                    <div className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-999 p-4">
-                        <div className="bg-gray-100 rounded-lg shadow-lg max-w-2xl w-full max-h-[95vh] overflow-x-auto">
+                    <div className="fixed inset-0 bg-transparent bg-opacity-50 flex items-center justify-center z-999 p-4" onClick={closeModal}>
+                        <div className="bg-gray-100 rounded-lg shadow-lg max-w-2xl w-full max-h-[95vh] overflow-x-auto" onClick={(e) => e.stopPropagation()}>
                             <div className="sticky top-0 flex justify-between items-center p-4 border-b bg-white ">
                                 <h3 className="text-lg font-bold ">ໃບສໍາລັບການສັ່ງ</h3>
                                 <button onClick={closeModal} className="text-2xl font-bold text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">×</button>

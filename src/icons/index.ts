@@ -59,11 +59,13 @@ import { ReactComponent as Order } from "./cart-check.svg?react";
 import { ReactComponent as Dashboard_new } from "./dashboard-new.svg?react";
 import { ReactComponent as Sale } from "./sale.svg?react";
 import { ReactComponent as Category } from "./category-new.svg?react";
+import { ReactComponent as Payment } from "./payment.svg?react";
 
 export {
   Order,
   Product,
   Category,
+  Payment,
   Dashboard_new,
   ErrorHexaIcon,
   Sale,

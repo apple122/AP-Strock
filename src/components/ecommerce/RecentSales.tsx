@@ -24,7 +24,8 @@ export default function RecentSales() {
                 // Fetch the 5 most recent order items
                 const { data, error: err } = await supabase
                     .from('OrderItem')
-                    .select(`*, pro_id(*), order_id(*)`)
+                    .select(`*, pro_id(*), order_id!inner(phase_id!inner(status))`)
+                    .eq('order_id.phase_id.status', 'active')
                     .order('id', { ascending: false })
                     .limit(5)
 

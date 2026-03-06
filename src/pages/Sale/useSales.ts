@@ -30,7 +30,8 @@ export function useSales() {
             // Fetch order items with product and order info, paginated
             const { data, error: err, count } = await supabase
                 .from('OrderItem')
-                .select(`*, pro_id(*), order_id(*)`, { count: 'exact' })
+                .select(`*, pro_id(*, cate_id(*)), order_id!inner(phase_id!inner(phase_name, status), order, promotion)`, { count: 'exact' })
+                .eq('order_id.phase_id.status', 'active')
                 .order('id', { ascending: false })
                 .range(from, to)
 

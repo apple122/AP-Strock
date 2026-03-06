@@ -2,7 +2,7 @@ export function InvoiceContent({ order }: { order: any }) {
     return (
         <div style={{ padding: '20px' }}>
             <div style={{ border: '1px solid #ddd', padding: '15px', borderRadius: '5px' }}>
-                <p style={{ margin: '5px 0' }}><strong>Order #{order.id}</strong></p>
+                <p style={{ margin: '5px 0' }}><strong>Order #{order.order}</strong></p>
                 <p style={{ margin: '5px 0' }}><strong>ວັນທີ່:</strong> {order.created_at ? new Date(order.created_at).toLocaleString('lo-LA', { timeZone: 'Asia/Vientiane' }) : ''}</p>
                 <p style={{ margin: '5px 0' }}><strong>ການຈ່າຍ:</strong> {order.pm_type}</p>
                 <p style={{ margin: '5px 0' }}><strong>ຈັດສົ່ງ:</strong> <br/>

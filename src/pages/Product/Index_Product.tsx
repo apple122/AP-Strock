@@ -33,7 +33,8 @@ export default function Index_Product() {
                 setLoadingTotal(true)
                 const { data: allProducts } = await supabase
                     .from('Product')
-                    .select('*')
+                    .select('*, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
                 let cost = 0, target = 0, actual = 0;
                 if (allProducts) {
                     allProducts.forEach((p: any) => {
@@ -335,6 +336,7 @@ export default function Index_Product() {
 
                             {/* Table Body */}
                             <TableBody className="divide-y divide-gray-100 dark:divide-white/[0.05]">
+                            
                                 {products.map((product: any, idx: number) => (
                                     <TableRow onClick={() => plusArchived(product)} key={product.id} className={`hover:bg-gray-200 dark:hover:bg-gray-800 cursor-pointer ${(product.qty_stock || 0) === 0 ? 'bg-gray-400 dark:bg-gray-700' : ''}`}>
                                         <TableCell className="px-5 py-4 text-gray-500 text-theme-sm dark:text-gray-400">
@@ -404,6 +406,13 @@ export default function Index_Product() {
                                         </TableCell>
                                     </TableRow>
                                 ))}
+                                {products.length === 0 && !loading && (
+                                    <TableRow>
+                                        <TableCell className="px-4 py-6 w-full text-center text-gray-500 dark:text-gray-400">
+                                            ບໍ່ມີລາຍການ
+                                        </TableCell>
+                                    </TableRow>
+                                )}
                             </TableBody>
                         </Table>
                     )}

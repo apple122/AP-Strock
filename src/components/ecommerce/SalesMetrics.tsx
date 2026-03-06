@@ -14,6 +14,8 @@ export default function SalesMetrics() {
     const [monthCount, setMonthCount] = useState(0)
     const [totalSales, setTotalSales] = useState(0) // all-time total
     const [totalCount, setTotalCount] = useState(0) // all-time order count
+    const [totalExpenses, setTotalExpenses] = useState(0) // all-time total expenses
+    const [expenseCount, setExpenseCount] = useState(0) // total expense count
     const [dailyMetrics, setDailyMetrics] = useState<SalesMetric[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -36,7 +38,8 @@ export default function SalesMetrics() {
                 // Fetch all orders for metrics
                 const { data: allSales, error: fetchErr } = await supabase
                     .from('Order')
-                    .select('*')
+                    .select('*, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
                     .gte('created_at', monthStart)
                     .lte('created_at', monthEnd)
 
@@ -84,7 +87,8 @@ export default function SalesMetrics() {
                 // fetch all-time sales total and count
                 const { data: allOrders } = await supabase
                     .from('Order')
-                    .select('sale_price')
+                    .select('sale_price, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
                 let grandTotal = 0
                 const countAll = allOrders?.length || 0
                 if (allOrders) {
@@ -94,6 +98,21 @@ export default function SalesMetrics() {
                 }
                 setTotalSales(grandTotal)
                 setTotalCount(countAll)
+
+                // fetch all expenses total and count
+                const { data: allExpenses } = await supabase
+                    .from('Expenses')
+                    .select('amount, phase_id!inner(status)')
+                    .eq('phase_id.status', 'active')
+                let expensesTotal = 0
+                const countExpenses = allExpenses?.length || 0
+                if (allExpenses) {
+                    allExpenses.forEach((e: any) => {
+                        expensesTotal += e.amount || 0
+                    })
+                }
+                setTotalExpenses(expensesTotal)
+                setExpenseCount(countExpenses)
 
                 // Build last 7 days
                 const days: SalesMetric[] = []
@@ -146,12 +165,25 @@ export default function SalesMetrics() {
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{monthCount} ລາຍການ</p>
                 </div>
-                <div className="rounded-xl border col-span-2 lg:col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                <div className="rounded-xl border col-span-1 lg:col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດຂາຍທັງໝົດ</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {loading ? '...' : totalSales.toLocaleString('en-US')} ₭
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{loading ? '...' : totalCount} ລາຍການ</p>
+                </div>
+                <div className="rounded-xl border col-span-1 lg:col-span-1 border-red-400 bg-white p-4 dark:border-red-400 dark:bg-white/[0.03]">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ລາຍຈ່າຍທັງໝົດ</p>
+                    <p className="text-2xl font-bold text-red-400 dark:text-red-400">
+                        - {loading ? '...' : totalExpenses.toLocaleString('en-US')} ₭
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{loading ? '...' : expenseCount} ລາຍການ</p>
+                </div>
+                <div className="rounded-xl border col-span-2 lg:col-span-2 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດເງິນຄົງເຫຼືອ / ທັ້ງໝົດ</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {loading ? '...' : (totalSales - totalExpenses).toLocaleString('en-US')} ₭
+                    </p>
                 </div>
             </div>
 

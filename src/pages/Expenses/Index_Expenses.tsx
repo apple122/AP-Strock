@@ -1,31 +1,35 @@
 import Button from "../../components/ui/button/Button";
-import { useCategories } from './useCategories';
-import CategoryTable from './CategoryTable';
+import { useExpenses } from './useExpenses';
+import ExpensesTable from './ExpensesTable';
 
-export default function Index_Category() {
+export default function Index_Expenses() {
   const {
-    categories,
+    expenses,
     totalCount,
     loading,
     error,
-    fetchCategories,
+    payees,
+    fetchExpenses,
     handleCreate,
     handleUpdate,
     handleDelete,
-  } = useCategories()
+  } = useExpenses()
 
   const onExport = async () => {
-    if (!categories || categories.length === 0) {
-      alert('No categories to export')
+    if (!expenses || expenses.length === 0) {
+      alert('No expenses to export')
       return
     }
 
     // Prepare data
-    const headers = ['ຊື່ປະເພດ', 'ລາຍລະອຽດ', 'ວັນທີ່ສ້າງ']
-    const rows = categories.map((c: any) => [
-      c.name || '',
-      c.description || '',
-      c.created_at ? new Date(c.created_at).toLocaleString() : '',
+    const headers = ['#ເຟສ', 'ເວລາ', 'ຈຳນວນເງີນ', 'ຜູ້ຮັບເງີນ', 'ລາຍລະອຽດ', 'ຜູ້ສ້າງ']
+    const rows = expenses.map((e: any) => [
+      e.phase_id?.phase_name ?? '',
+      e.created_at ? new Date(e.created_at).toLocaleString() : '',
+      e.amount ?? '',
+      e.payee_id?.name || '',
+      e.description || '',
+      e.user_id?.fullname || '',
     ])
 
     // Try SheetJS (.xlsx) via dynamic import
@@ -34,9 +38,9 @@ export default function Index_Category() {
       const wb = XLSX.utils.book_new()
       const aoa = [headers, ...rows]
       const ws = XLSX.utils.aoa_to_sheet(aoa)
-      XLSX.utils.book_append_sheet(wb, ws, 'Categories')
+      XLSX.utils.book_append_sheet(wb, ws, 'Expenses')
       const ts = new Date().toISOString().replace(/[:.]/g, '-')
-      XLSX.writeFile(wb, `categories-${ts}.xlsx`)
+      XLSX.writeFile(wb, `ລາຍຈ່າຍ-${ts}.xlsx`)
       return
     } catch (xlsxErr) {
       console.warn('SheetJS not available, falling back to CSV export', xlsxErr)
@@ -45,7 +49,7 @@ export default function Index_Category() {
     // Fallback: CSV download (UTF-8 BOM)
     try {
       const bom = '\uFEFF'
-      const titleLine = 'ປະເພດສິນຄ້າ'
+      const titleLine = 'ລາຍການໃຊ້ຈ່າຍ'
       const csvLines = [
         titleLine,
         '',
@@ -59,7 +63,7 @@ export default function Index_Category() {
       const a = document.createElement('a')
       const ts = new Date().toISOString().replace(/[:.]/g, '-')
       a.href = url
-      a.download = `categories-${ts}.csv`
+      a.download = `expenses-${ts}.csv`
       document.body.appendChild(a)
       a.click()
       a.remove()
@@ -73,10 +77,10 @@ export default function Index_Category() {
   return (
     <>
       <div className="flex justify-end mb-2 gap-1">
-        <Button size="sm" className='h-6' variant="outline" onClick={handleCreate}>
-          ເພີມລາຍການ
+        <Button size="sm" className='h-6' variant="outline" onClick={() => handleCreate()}>
+          ເພີມລາຍການໃຊ້ຈ່າຍ
         </Button>
-        <Button size="sm" className='h-6' variant="outline" onClick={fetchCategories}>
+        <Button size="sm" className='h-6' variant="outline" onClick={fetchExpenses}>
           Refresh
         </Button>
         <Button size="sm" className='h-6' variant="outline" onClick={onExport}>
@@ -90,14 +94,14 @@ export default function Index_Category() {
         </div>
       )}
 
-      <CategoryTable
-        categories={categories}
+      <ExpensesTable
+        expenses={expenses}
         totalCount={totalCount}
         loading={loading}
+        payees={payees}
         handleUpdate={handleUpdate}
         handleDelete={handleDelete}
       />
     </>
   )
 }
-

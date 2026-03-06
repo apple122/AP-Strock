@@ -22,7 +22,8 @@ import {
   Category,
   Dashboard_new,
   Sale,
-  Order
+  Order,
+  Payment,
 } from "../icons";
 import { useSidebar } from "../context/SidebarContext";
 // import SidebarWidget from "./SidebarWidget";
@@ -87,6 +88,11 @@ const navItems: NavItem[] = [
 ];
 
 const othersItems: NavItem[] = [
+  {
+    icon: <Payment />,
+    name: "ລາຍຈ່າຍອື່ນໆ",
+    path: "/expenses",
+  },
   {
     icon: <PlugInIcon />,
     name: "ອອກລະບົບ",

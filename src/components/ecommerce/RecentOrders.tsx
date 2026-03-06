@@ -32,8 +32,10 @@ export default function RecentOrders() {
       // Fetch recent order items with optional limit
       let query = supabase
         .from('OrderItem')
-        .select(`*, pro_id(*, cate_id(*)), order_id(*)`)
+        .select(`*, pro_id(*, cate_id(*)), order_id!inner(phase_id!inner(status), order, promotion)`, { count: 'exact' })
+        .eq('order_id.phase_id.status', 'active')
         .order('id', { ascending: false })
+
       if (limit !== null) {
         query = query.limit(limit)
       }

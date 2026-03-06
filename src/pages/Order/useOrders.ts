@@ -8,12 +8,15 @@ export interface OrderItem {
   pro_id?: number
   qty?: number
   price?: number
+  phase_id?: number
 }
 
 export interface Order {
   id: number
   created_at?: string
-  user_id?: number
+  user_id?: {
+    fullname: string
+  }
   pm_type?: string
   sale_price?: number
   address?: any
@@ -22,7 +25,9 @@ export interface Order {
   delivery_confirmed?: string
   promotion?: number
   payee?: string
-  items?: OrderItem[]
+  phase_id?: number
+  order?: string
+  OrderItem?: OrderItem[]
 }
 
 export function useOrders() {
@@ -44,7 +49,8 @@ export function useOrders() {
 
       const { data, error: err, count } = await supabase
         .from('Order')
-        .select(`*, OrderItem(*, pro_id(*, cate_id(*))), user_id(*)`, { count: 'exact' })
+        .select(`*, OrderItem(*, pro_id(*, cate_id(*))), user_id(*), phase_id!inner(phase_name, status)`, { count: 'exact' })
+        .eq('phase_id.status', 'active')
         .order('id', { ascending: false })
         .range(from, to)
 

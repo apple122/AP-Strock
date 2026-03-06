@@ -34,7 +34,16 @@ export default function CreateOrder() {
         // load products for selection (include current stock quantity)
         supabase
             .from('Product')
-            .select('*')
+            .select(
+                `*,
+          user(*),
+          cate_id(*),
+          phase_id!inner(phase_name, status)`,
+                { count: 'exact' }
+            )
+            .eq('phase_id.status', 'active')
+            .order('id', { ascending: false })
+            .order('is_archived', { ascending: true })
             .then(res => {
                 if (res.data) setProducts(res.data as any)
             })
@@ -114,6 +123,19 @@ export default function CreateOrder() {
 
         setLoading(true)
         try {
+            // Get active phase
+            const { data: activePhase } = await supabase
+                .from('Phase')
+                .select('id')
+                .eq('status', 'active')
+                .single()
+
+            if (!activePhase) {
+                alert('No active phase found. Please create a phase first.')
+                setLoading(false)
+                return
+            }
+
             const totalQty = computeTotalQty()
             const salePrice = computeSalePrice()
 
@@ -137,6 +159,7 @@ export default function CreateOrder() {
                 payee: payee || null,
                 user_id: user?.id || null,
                 order: (order_count || 1), // simple incremental order number
+                phase_id: activePhase.id,
             }
 
             const { data: orderData, error: orderErr } = await supabase
@@ -155,6 +178,7 @@ export default function CreateOrder() {
                 pro_id: it.pro_id,
                 qty: it.qty,
                 price: it.price || it.sell_price || null,
+                phase_id: activePhase.id,
             }))
 
             const { error: itemsErr } = await supabase.from('OrderItem').insert(itemsPayload)
