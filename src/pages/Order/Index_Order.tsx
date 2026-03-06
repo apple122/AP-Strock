@@ -227,7 +227,7 @@ export default function Index_Order() {
                     ) : (
                         <Table>
                             <TableHeader className="border-b border-gray-100 dark:border-white/[0.05]">
-                                <TableRow>
+                                <TableRow className={orders.length === 0 ? 'hidden' : ''}>
                                     <TableCell
                                         isHeader
                                         className="sticky left-0 z-20 px-5 w-1 font-medium text-gray-500 text-start text-theme-xs dark:text-gray-400 bg-gray-50 dark:bg-gray-900/50 dark:border-blue-800"

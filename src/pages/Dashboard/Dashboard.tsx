@@ -80,7 +80,7 @@ export default function Dashboard() {
               value={selectedPhase}
               onChange={handlePhaseChange}
               disabled={loading || isChangingPhase}
-              className="h-8 text-sm rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="h-8 px-2 text-sm rounded bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <option value="new">+ ສ້າງຂໍ້ມູນໃໝ່</option>
               {phases.map(p => (
