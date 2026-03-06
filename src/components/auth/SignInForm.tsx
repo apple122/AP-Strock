@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import { EyeCloseIcon, EyeIcon } from "../../icons";
 import Label from "../form/Label";
@@ -8,30 +8,34 @@ import Button from "../ui/button/Button";
 import { supabase } from "../../lib/supabase";
 
 export default function SignInForm() {
-  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
-  const [email, setEmail] = useState("");
+  const [Name, setName] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleCheckboxChange = (checked: boolean) => {
-    setIsChecked(checked);
-    if (!checked) {
-      // Clear saved credentials when unchecked
-      localStorage.removeItem("savedEmail");
-      localStorage.removeItem("savedPassword");
-      localStorage.removeItem("rememberMe");
+  const navigate = useNavigate();
+
+  // Load saved credentials on component mount
+  useEffect(() => {
+    const savedName = localStorage.getItem("savedName");
+    const savedPassword = localStorage.getItem("savedPassword");
+    const rememberMe = localStorage.getItem("rememberMe") === "true";
+
+    if (rememberMe && savedName && savedPassword) {
+      setName(savedName);
+      setPassword(savedPassword);
+      setIsChecked(true);
     }
-  };
+  });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage("");
 
-    if (!email || !password) {
-      setErrorMessage("Please enter both email and password.");
+    if (!Name || !password) {
+      setErrorMessage("Please enter both name and password.");
       return;
     }
     setLoading(true);
@@ -39,12 +43,12 @@ export default function SignInForm() {
     const { data, error } = await supabase
       .from("users")
       .select("*")
-      .eq("email", email)
+      .eq("UserName", Name)
       .eq("password", password)
       .single();
 
     if (error || !data) {
-      setErrorMessage("Invalid email or password.");
+      setErrorMessage("Invalid name or password.");
       setLoading(false);
       return;
     }
@@ -54,17 +58,6 @@ export default function SignInForm() {
     // setUser(data);
     navigate("/home");
     setLoading(false);
-
-    // Save or clear credentials based on checkbox
-    if (isChecked) {
-      localStorage.setItem("savedEmail", email);
-      localStorage.setItem("savedPassword", password);
-      localStorage.setItem("rememberMe", "true");
-    } else {
-      localStorage.removeItem("savedEmail");
-      localStorage.removeItem("savedPassword");
-      localStorage.removeItem("rememberMe");
-    }
   };
 
   return (
@@ -150,12 +143,12 @@ export default function SignInForm() {
               <div className="space-y-6">
                 <div>
                   <Label>
-                    ອີເມວ <span className="text-error-500">*</span>{" "}
+                    ຊື່ຜູ້ໃຊ້ <span className="text-error-500">*</span>{" "}
                   </Label>
                   <Input
-                    placeholder="info@gmail.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="UserName"
+                    value={Name}
+                    onChange={(e) => setName(e.target.value)}
                     disabled={loading}
                   />
                 </div>
@@ -185,7 +178,7 @@ export default function SignInForm() {
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Checkbox checked={isChecked} onChange={handleCheckboxChange} />
+                    <Checkbox checked={isChecked} onChange={setIsChecked} />
                     <span className="block font-normal text-gray-700 text-theme-sm dark:text-gray-400">
                       Keep me logged in
                     </span>
