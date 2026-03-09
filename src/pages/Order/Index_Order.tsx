@@ -90,7 +90,7 @@ export default function Index_Order() {
         payeeTotalsMap[name] = (payeeTotalsMap[name] || 0) + (o.sale_price || 0)
     })
 
-    
+
     const onExport = async () => {
         if (!orders || orders.length === 0) {
             alert('No orders to export')
@@ -116,7 +116,7 @@ export default function Index_Order() {
                 o.created_at ? new Date(o.created_at).toLocaleString() : '',
                 o.pm_type || '',
                 o.total_qty ?? '',
-                o.sale_price ?? '',
+                o.sale_price != null ? o.sale_price.toLocaleString('en-US') + ' ₭' : '-',
                 o.payee ?? '',
                 items,
                 o.user_id?.fullname || '',

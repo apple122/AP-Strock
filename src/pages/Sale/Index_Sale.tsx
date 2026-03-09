@@ -22,14 +22,24 @@ export default function Index_Sale() {
         const fetchGrandTotal = async () => {
             try {
                 setLoadingTotal(true)
-                const { data: allOrders } = await supabase
-                    .from('Order')
-                    .select('sale_price, phase_id!inner(status)')
-                    .eq('phase_id.status', 'active')
+                const { data: allItems } = await supabase
+                    .from('OrderItem')
+                    .select('qty, price, order_id!inner(promotion, phase_id!inner(status))')
+                    .eq('order_id.phase_id.status', 'active')
                 let total = 0
-                if (allOrders) {
-                    allOrders.forEach((o: any) => {
-                        total += o.sale_price || 0
+                if (allItems) {
+                    allItems.forEach((item: any) => {
+                        const promotion = item.order_id?.promotion
+                        const qty = item.qty || 0
+                        const price = item.price || 0
+
+                        if (promotion === 0) {
+                            total += 0
+                        } else if (promotion == null) {
+                            total += price * qty
+                        } else {
+                            total += promotion * qty
+                        }
                     })
                 }
                 setTotalAllRevenue(total)
@@ -60,14 +70,14 @@ export default function Index_Sale() {
     }, [])
 
     // page-level aggregates for visible sales
-    const filteredSales = selectedProduct === '' 
-        ? sales 
+    const filteredSales = selectedProduct === ''
+        ? sales
         : sales.filter(sale => sale.pro_id?.id === selectedProduct)
-    
+
     const salesCount = filteredSales?.length || 0
     const totalQuantity = filteredSales.reduce((s: number, sale: any) => s + (sale.qty || 0), 0)
     const totalRevenue = filteredSales.reduce((s: number, sale: any) => {
-        const itemTotal = sale.order_id?.promotion ? (sale.order_id.promotion * (sale.qty || 0)) : ((sale.price || 0) * (sale.qty || 0))
+        const itemTotal = sale.order_id?.promotion == null ? ((sale.price || 0) * (sale.qty || 0)) : (sale.order_id.promotion * (sale.qty || 0))
         return s + (itemTotal || 0)
     }, 0)
 
@@ -79,15 +89,15 @@ export default function Index_Sale() {
             return
         }
 
-        const headers = ['#ເຟສ','IMG', 'ສິນຄ້າ', 'ຈຳນວນຂາຍ', 'ລາຄາ', 'ລາຄາໂປຣ', 'ເງີນລວມ', 'ເວລາຂາຍ']
+        const headers = ['#ເຟສ', 'IMG', 'ສິນຄ້າ', 'ຈຳນວນຂາຍ', 'ລາຄາ', 'ລາຄາໂປຣ', 'ເງີນລວມ', 'ເວລາຂາຍ']
         const rows = sales.map((sale: any) => [
             sale.order_id?.phase_id?.phase_name || '',
             sale.pro_id?.pro_img || '',
             sale.pro_id?.pro_name || '',
             sale.qty || '',
-            sale.price != null ? sale.price : '',
-            sale.order_id?.promotion != null ? sale.order_id.promotion : '',
-            sale.order_id?.promotion ? sale.order_id.promotion * sale.qty : (sale.price || 0) * (sale.qty || 0),
+            sale.price != null ? `${sale.price.toLocaleString('en-US')} ₭` : '—',
+            sale.order_id?.promotion != null ? `${sale.order_id.promotion.toLocaleString('en-US')} ₭` : '—',
+            sale.order_id?.promotion === 0 ? '0' : `${(sale.order_id?.promotion == null ? (sale.price * sale.qty) : (sale.order_id?.promotion * sale.qty)).toLocaleString('en-US')} ₭`,
             sale.created_at ? new Date(sale.created_at).toLocaleString() : '',
         ])
 
@@ -290,11 +300,11 @@ export default function Index_Sale() {
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                                                 {sale.price ? `${sale.price.toLocaleString('en-US')} ₭` : '—'}
                                             </TableCell>
-                                            <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {sale.order_id?.promotion ? `${sale.order_id?.promotion.toLocaleString('en-US')} ₭` : '—'}
+                                            <TableCell className="px-4 py-3 text-red-500 text-start text-theme-sm">
+                                                {sale.order_id?.promotion == null ? '_' : sale.order_id?.promotion === 0 ? '0' : `${sale.order_id?.promotion.toLocaleString('en-US')} ₭`}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
-                                                {(sale.order_id?.promotion ? sale.order_id?.promotion * sale.qty : sale.price * sale.qty).toLocaleString('en-US')} ₭
+                                                {sale.order_id?.promotion === 0 ? '0' : `${(sale.order_id?.promotion == null ? (sale.price * sale.qty) : (sale.order_id?.promotion * sale.qty)).toLocaleString('en-US')} ₭`}
                                             </TableCell>
                                             <TableCell className="px-4 py-3 text-gray-500 text-start text-theme-sm dark:text-gray-400">
                                                 {new Date(sale.created_at).toLocaleString() || '—'}
