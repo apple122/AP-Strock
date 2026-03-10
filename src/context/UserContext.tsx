@@ -19,6 +19,7 @@ const UserContext = createContext<UserContextType | undefined>(undefined);
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     children,
 }) => {
+
     const [user, setUser] = useState<User | null>(null);
     //   console.log("UserContext: ", user);
 
@@ -34,6 +35,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
                     .single();
 
                 setUser(data || null);
+                // Navigat
             } catch (error) {
                 console.error("Failed to fetch user data:", error);
             }

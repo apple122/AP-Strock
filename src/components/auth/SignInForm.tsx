@@ -8,6 +8,7 @@ import Button from "../ui/button/Button";
 import { supabase } from "../../lib/supabase";
 
 export default function SignInForm() {
+  const navigate = useNavigate()
   const [showPassword, setShowPassword] = useState(false);
   const [isChecked, setIsChecked] = useState(false);
   const [Name, setName] = useState("");
@@ -15,7 +16,7 @@ export default function SignInForm() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // Load saved credentials on component mount
   useEffect(() => {
@@ -57,7 +58,6 @@ export default function SignInForm() {
     localStorage.setItem("user", JSON.stringify(data?.id));
     // setUser(data);
     navigate("/home");
-    window.location.href = "/home";
     setLoading(false);
   };
 
