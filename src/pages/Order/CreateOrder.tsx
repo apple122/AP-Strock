@@ -30,8 +30,6 @@ export default function CreateOrder() {
     const [showAddItem, setShowAddItem] = useState(false)
     const [selectedQty, setSelectedQty] = useState(1)
 
-    console.log('promotion', promotion)
-
     useEffect(() => {
         // load products for selection (include current stock quantity)
         supabase

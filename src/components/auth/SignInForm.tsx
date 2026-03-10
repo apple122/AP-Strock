@@ -57,6 +57,7 @@ export default function SignInForm() {
     localStorage.setItem("user", JSON.stringify(data?.id));
     // setUser(data);
     navigate("/home");
+    window.location.href = "/home";
     setLoading(false);
   };
 
