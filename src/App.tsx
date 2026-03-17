@@ -27,7 +27,6 @@ import CreateOrder from "./pages/Order/CreateOrder";
 import Index_Sale from "./pages/Sale/Index_Sale";
 import Dashboard from "./pages/Dashboard/Dashboard";
 import Index_Expenses from "./pages/Expenses/Index_Expenses";
-import Home from "./pages/Dashboard/Home";
 
 export default function App() {
   return (
@@ -37,8 +36,7 @@ export default function App() {
         <Routes>
           {/* Dashboard Layout */}
           <Route element={<AppLayout />}>
-            {/* <Route index path="/*" element={<Dashboard />} /> */}
-            <Route index path="/*" element={<Home />} />
+            <Route index path="/*" element={<Dashboard />} />
 
             {/* Dashboard Page  */}
             {/* <Route path="/home" element={<Home />} /> */}
