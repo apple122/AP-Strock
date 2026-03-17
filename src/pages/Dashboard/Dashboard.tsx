@@ -49,7 +49,7 @@ export default function Dashboard() {
         alert('Please select an active phase to export');
         return;
       }
-      
+
       await exportExcel(activePhase);
       alert('Export completed successfully');
     } catch (err) {

@@ -1,4 +1,4 @@
-import React, { createContext, useState, useContext, useEffect } from "react";
+import React, { createContext, useState, useContext, useEffect, useCallback } from "react";
 import { supabase } from "../lib/supabase";
 
 interface User {
@@ -12,6 +12,7 @@ interface User {
 interface UserContextType {
     user: User | null;
     setUser: React.Dispatch<React.SetStateAction<User | null>>;
+    DataUser: () => Promise<void>;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -23,7 +24,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     const [user, setUser] = useState<User | null>(null);
     //   console.log("UserContext: ", user);
 
-    const DataUser = async () => {
+    const DataUser = useCallback(async () => {
         const storedUser = localStorage.getItem("user");
         if (storedUser) {
             try {
@@ -40,7 +41,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
                 console.error("Failed to fetch user data:", error);
             }
         }
-    }
+    }, [setUser]);
 
     useEffect(() => {
         DataUser()
@@ -57,7 +58,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({
     }, []);
 
     return (
-        <UserContext.Provider value={{ user, setUser }}>
+        <UserContext.Provider value={{ user, setUser, DataUser }}>
             {children}
         </UserContext.Provider>
     );

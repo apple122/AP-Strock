@@ -104,7 +104,11 @@ const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
   const location = useLocation();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user, DataUser } = useUser();
+
+  useEffect(() => {
+    DataUser();
+  }, [location.pathname, DataUser]);
 
   const handleLogout = () => {
     localStorage.removeItem("user");

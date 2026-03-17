@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
+import Chart from 'react-apexcharts'
 
 interface SalesMetric {
     date: string
@@ -20,6 +21,8 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
     const [totalCount, setTotalCount] = useState(0) // all-time order count
     const [totalExpenses, setTotalExpenses] = useState(0) // all-time total expenses
     const [expenseCount, setExpenseCount] = useState(0) // total expense count
+    const [topHourInfo, setTopHourInfo] = useState<{ hour: number, count: number } | null>(null) // most popular hour
+    const [hourlySales, setHourlySales] = useState<number[]>(Array(24).fill(0)) // 24 hours of sales data
     const [dailyMetrics, setDailyMetrics] = useState<SalesMetric[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -54,6 +57,8 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
                 let mCount = 0
                 let mTotal = 0
                 const dailyMap: Record<string, { count: number; total: number }> = {}
+                const hourlyCounts: Record<number, number> = {}
+                const hTotals = Array(24).fill(0)
 
                 if (allSales) {
                     allSales.forEach((item: any) => {
@@ -79,6 +84,12 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
                         if (dateStr === today) {
                             tCount++
                             tTotal += itemTotal
+
+                            if (created) {
+                                const hour = created.getHours()
+                                hourlyCounts[hour] = (hourlyCounts[hour] || 0) + 1
+                                hTotals[hour] += itemTotal
+                            }
                         }
                     })
                 }
@@ -91,17 +102,47 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
                 // fetch all-time sales total and count
                 const { data: allOrders } = await supabase
                     .from('Order')
-                    .select('sale_price, phase_id!inner(status)')
+                    .select('sale_price, created_at, phase_id!inner(status)')
                     .eq('phase_id.status', 'active')
                 let grandTotal = 0
                 const countAll = allOrders?.length || 0
+
+                // For the "all-time" 24H hourly distribution chart
+                for (let h = 0; h < 24; h++) {
+                    hourlyCounts[h] = 0
+                }
+
                 if (allOrders) {
                     allOrders.forEach((o: any) => {
-                        grandTotal += o.sale_price || 0
+                        const itemTotal = o.sale_price || 0
+                        grandTotal += itemTotal
+
+                        if (o.created_at) {
+                            const created = new Date(o.created_at)
+                            const hour = created.getHours()
+                            hourlyCounts[hour] = (hourlyCounts[hour] || 0) + 1
+                            hTotals[hour] += itemTotal
+                        }
                     })
                 }
                 setTotalSales(grandTotal)
                 setTotalCount(countAll)
+                setHourlySales(hTotals)
+
+                // Keep top hour logic (all-time)
+                let bestHour = -1
+                let maxOrders = 0
+                for (let h = 0; h < 24; h++) {
+                    if (hourlyCounts[h] && hourlyCounts[h] > maxOrders) {
+                        maxOrders = hourlyCounts[h]
+                        bestHour = h
+                    }
+                }
+                if (bestHour >= 0) {
+                    setTopHourInfo({ hour: bestHour, count: maxOrders })
+                } else {
+                    setTopHourInfo(null)
+                }
 
                 // fetch all expenses total and count
                 const { data: allExpenses } = await supabase
@@ -183,11 +224,18 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
                     </p>
                     <p className="text-xs text-gray-500 mt-1">{loading ? '...' : expenseCount} ລາຍການ</p>
                 </div>
-                <div className="rounded-xl border col-span-2 lg:col-span-2 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                <div className="rounded-xl border col-span-2 lg:col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຍອດເງິນຄົງເຫຼືອ / ທັ້ງໝົດ</p>
                     <p className="text-2xl font-bold text-gray-900 dark:text-white">
                         {loading ? '...' : (totalSales - totalExpenses).toLocaleString('en-US')} ₭
                     </p>
+                </div>
+                <div className="rounded-xl border col-span-2 lg:col-span-1 border-gray-200 bg-white p-4 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">ຊ່ວງເວລາຂາຍດີທີ່ສຸດ (ທັງໝົດ)</p>
+                    <p className="text-2xl font-bold text-gray-900 dark:text-white">
+                        {loading ? '...' : topHourInfo ? `${String(topHourInfo.hour).padStart(2, '0')}:00 - ${String(topHourInfo.hour + 1).padStart(2, '0')}:00` : '-'}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">{loading ? '...' : topHourInfo ? `${topHourInfo.count} ລາຍການ` : 'ຍັງບໍ່ມີອໍເດີ'}</p>
                 </div>
             </div>
 
@@ -226,6 +274,68 @@ export default function SalesMetrics({ refreshTrigger }: SalesMetricsProps = {})
                                 </div>
                             )
                         })
+                    )}
+                </div>
+            </div>
+
+            {/* 24H Hourly breakdown */}
+            <div className="rounded-xl border border-gray-200 bg-white p-6 dark:border-white/[0.05] dark:bg-white/[0.03]">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">ຍອດຂາຍແຕ່ລະຊົ່ວໂມງ (ທັງໝົດ)</h3>
+                <div className="h-[300px] w-full">
+                    {loading ? (
+                        <div className="flex h-full items-center justify-center">
+                            <span className="text-gray-500">ກຳລັງໂຫລດ...</span>
+                        </div>
+                    ) : (
+                        <Chart
+                            options={{
+                                chart: {
+                                    type: 'bar',
+                                    toolbar: { show: false },
+                                    fontFamily: 'inherit'
+                                },
+                                plotOptions: {
+                                    bar: { borderRadius: 4, columnWidth: '60%' }
+                                },
+                                xaxis: {
+                                    categories: Array.from({ length: 24 }, (_, i) => `${i}:00`),
+                                    labels: {
+                                        formatter: (val: string) => {
+                                            if (!val) return '';
+                                            const hour = parseInt(val.split(':')[0], 10);
+                                            return hour % 3 === 0 ? val : '';
+                                        },
+                                        style: { colors: '#9ca3af', fontSize: '11px' },
+                                        rotate: -45,
+                                        rotateAlways: false,
+                                        hideOverlappingLabels: true,
+                                    },
+                                    axisBorder: { show: false },
+                                    axisTicks: { show: false }
+                                },
+                                yaxis: {
+                                    labels: {
+                                        formatter: (val: number) => val.toLocaleString() + ' ₭',
+                                        style: { colors: '#9ca3af' }
+                                    }
+                                },
+                                dataLabels: { enabled: false },
+                                tooltip: {
+                                    theme: 'dark',
+                                    y: { formatter: (val: number) => val.toLocaleString() + ' ₭' }
+                                },
+                                colors: ['#3b82f6'],
+                                grid: {
+                                    borderColor: '#f3f4f6',
+                                    strokeDashArray: 4,
+                                    xaxis: { lines: { show: false } },
+                                    yaxis: { lines: { show: true } }
+                                }
+                            }}
+                            series={[{ name: 'ຍອດຂາຍ', data: hourlySales }]}
+                            type="bar"
+                            height="100%"
+                        />
                     )}
                 </div>
             </div>

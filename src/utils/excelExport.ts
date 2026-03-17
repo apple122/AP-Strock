@@ -126,11 +126,47 @@ export const exportExcel = async (activePhase: Phase) => {
     const totalProfit = totalIncome - totalExpenses;
     const profitMargin = totalIncome > 0 ? (totalProfit / totalIncome * 100) : 0;
 
+    const hourlyCounts: Record<number, number> = {};
+    const hourlyTotals: Record<number, number> = {};
+    orders.forEach(o => {
+      if (o.created_at) {
+        const h = new Date(o.created_at).getHours();
+        hourlyCounts[h] = (hourlyCounts[h] || 0) + 1;
+        hourlyTotals[h] = (hourlyTotals[h] || 0) + (o.sale_price || 0);
+      }
+    });
+
+    let bestHour = -1;
+    let maxOrders = 0;
+    for (let h = 0; h < 24; h++) {
+      if (hourlyCounts[h] && hourlyCounts[h] > maxOrders) {
+        maxOrders = hourlyCounts[h];
+        bestHour = h;
+      }
+    }
+    const bestHourStr = bestHour >= 0
+      ? `${String(bestHour).padStart(2, '0')}:00 - ${String(bestHour + 1).padStart(2, '0')}:00 (${maxOrders} ລາຍການ)`
+      : '-';
+
+    const hourlyHeaders = ['ຊ່ວງເວລາ (ໂມງ)', 'ຈຳນວນລາຍການ (ອໍເດີ້)', 'ຍອດຂາຍລວມ (ກີບ)'];
+    const hourlyRows: any[] = [];
+    for (let h = 0; h < 24; h++) {
+      const timeStr = `${String(h).padStart(2, '0')}:00 - ${String(h + 1).padStart(2, '0')}:00`;
+      const count = hourlyCounts[h] || 0;
+      const total = hourlyTotals[h] || 0;
+      hourlyRows.push([
+        timeStr,
+        count,
+        total.toLocaleString('en-US') + ' ₭'
+      ]);
+    }
+
     const summaryRows = [
       ['ລາຍຮັບລວມ', totalIncome.toLocaleString('en-US') + ' ₭'],
       ['ລາຍຈ່າຍລວມ', totalExpenses.toLocaleString('en-US') + ' ₭'],
       ['ກຳໄລລວມ', totalProfit.toLocaleString('en-US') + ' ₭'],
-      ['ອັດຕາສ່ວນກຳໄລ', profitMargin.toFixed(2) + '%']
+      ['ອັດຕາສ່ວນກຳໄລ', profitMargin.toFixed(2) + '%'],
+      ['ຊ່ວງເວລາຂາຍດີທີ່ສຸດ', bestHourStr],
     ];
 
     // Prepare Payee Summary
@@ -187,11 +223,17 @@ export const exportExcel = async (activePhase: Phase) => {
       XLSX.utils.book_append_sheet(wb, expenseWs, 'ລາຍການໃຊ້ຈ່າຍ');
     }
 
+    if (hourlyRows.length > 0) {
+      const hourlyWs = XLSX.utils.aoa_to_sheet([hourlyHeaders, ...hourlyRows]);
+      XLSX.utils.book_append_sheet(wb, hourlyWs, 'ຍອດຂາຍແຕ່ລະຊົ່ວໂມງ');
+    }
+
     // Add Combined Summary Report sheet
     if (summaryRows.length > 0 || payeeRows.length > 0) {
       const combinedWs = XLSX.utils.aoa_to_sheet(combinedSummaryData);
       XLSX.utils.book_append_sheet(wb, combinedWs, 'ສະຫຼຸບລວມ');
     }
+
 
     // Generate filename with timestamp
     const ts = new Date().toISOString().replace(/[:.]/g, '-');

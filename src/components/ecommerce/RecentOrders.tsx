@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
 import {
   Table,
@@ -178,7 +178,7 @@ export default function RecentOrders() {
                 </TableCell>
               </TableRow>
             )}
-            
+
             {error && (
               <TableRow>
                 <TableCell className="py-6 text-center text-red-600">
@@ -196,9 +196,11 @@ export default function RecentOrders() {
             )}
 
             {!loading && products.map((item) => {
-              const isPromo = item.order_id?.promotion
-              const total = isPromo ? item.order_id.promotion * (item.qty || 0) : (item.price || 0) * (item.qty || 0)
-              
+              const isPromo = item.order_id?.promotion !== null && item.order_id?.promotion !== undefined;
+              const promoValue = isPromo ? item.order_id.promotion : 0;
+              const regularTotal = (item.price || 0) * (item.qty || 0);
+              const total = isPromo ? promoValue : regularTotal;
+
               return (
                 <TableRow key={item.id} className="">
                   <TableCell className="py-3">
@@ -231,14 +233,14 @@ export default function RecentOrders() {
                     {item.qty || 0}
                   </TableCell>
                   <TableCell className="px-4 text-center text-gray-500 text-theme-sm dark:text-gray-400">
-                    {(item.price || 0).toLocaleString('en-US')+'₭'}
+                    {(item.price || 0).toLocaleString('en-US') + '₭'}
                   </TableCell>
                   <TableCell className="px-4 text-center">
                     <Badge
                       size="sm"
                       color={isPromo ? "warning" : "success"}
                     >
-                     {isPromo ? "ໂປຣ:" : ""} {total.toLocaleString('en-US')}₭
+                      {isPromo ? "ໂປຣ:" : ""} {total.toLocaleString('en-US')}₭
                     </Badge>
                   </TableCell>
                 </TableRow>
