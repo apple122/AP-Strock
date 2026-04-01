@@ -221,10 +221,14 @@ export function useExpenses() {
                 .single()
 
             if (insError) throw insError
+<<<<<<< HEAD
             if (data) {
                 setExpenses((prev) => [data as Expense, ...prev])
                 window.dispatchEvent(new Event("refresh-notifications"));
             }
+=======
+            if (data) setExpenses((prev) => [data as Expense, ...prev])
+>>>>>>> 9a321277acfb1a59f637a392ee2afacfe15dafcc
         } catch (err) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to create expense'
             setError(errorMessage)

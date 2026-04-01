@@ -1,7 +1,10 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+<<<<<<< HEAD
     "incremental": true,
+=======
+>>>>>>> 9a321277acfb1a59f637a392ee2afacfe15dafcc
     "target": "ES2022",
     "lib": ["ES2023"],
     "module": "ESNext",
@@ -18,7 +21,12 @@
     "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+<<<<<<< HEAD
     "noFallthroughCasesInSwitch": true
+=======
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true
+>>>>>>> 9a321277acfb1a59f637a392ee2afacfe15dafcc
   },
   "include": ["vite.config.ts"]
 }

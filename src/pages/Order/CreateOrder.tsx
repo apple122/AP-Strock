@@ -208,7 +208,10 @@ export default function CreateOrder() {
                 }
             }
 
+<<<<<<< HEAD
             window.dispatchEvent(new Event("refresh-notifications"));
+=======
+>>>>>>> 9a321277acfb1a59f637a392ee2afacfe15dafcc
             navigate('/order')
         } catch (err) {
             console.error(err)
